@@ -27,3 +27,6 @@ id_ed25519*
 # OS
 .DS_Store
 Thumbs.db
+
+# Local backup snapshots created by `make backup`
+backups/
