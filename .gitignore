@@ -1,0 +1,29 @@
+# Never commit secrets
+*.env
+.env*
+!.env.example
+*.key
+*.pem
+*.p12
+id_rsa*
+id_ed25519*
+*_token
+*.token
+.credentials
+.netrc
+
+# Claude account configs (contain API tokens)
+.claude.json
+.claude.personal.json
+.claude.work.json
+
+# Shell session/history
+.zsh_sessions/
+.zsh_history
+.bash_history
+.lesshst
+.viminfo
+
+# OS
+.DS_Store
+Thumbs.db
