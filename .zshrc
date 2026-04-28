@@ -111,15 +111,17 @@ add-zsh-hook chpwd _autoenv_chpwd_hook
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
+# asdf < 0.16 shipped a shell init script; >= 0.16 (rewritten in Go) does not.
+# Source it only if present so this file works on either.
+[ -f /opt/homebrew/opt/asdf/libexec/asdf.sh ] && . /opt/homebrew/opt/asdf/libexec/asdf.sh
 alias tf=terraform
 eval "source <(/opt/homebrew/bin/starship init zsh --print-full-init)"
 
 #eval "$(direnv hook zsh)"
 
-export PATH=$PATH:$(go env GOPATH)/bin
+command -v go >/dev/null && export PATH="$PATH:$(go env GOPATH)/bin"
 
-. ~/.asdf/plugins/golang/set-env.zsh
+[ -f ~/.asdf/plugins/golang/set-env.zsh ] && . ~/.asdf/plugins/golang/set-env.zsh
 
 alias python=python3
 alias pip='python -mpip'
