@@ -11,35 +11,27 @@ Personal shell and tool configuration, managed with `make`.
 ## Install on a new machine
 
 ```sh
-# 1. Install required tooling
-brew install pre-commit gitleaks
-# (plus oh-my-zsh, starship, asdf, etc. — see Prerequisites)
-
-# 2. Clone
+# 1. Install Homebrew if you don't have it: https://brew.sh
 git clone git@github.com:ashwinimanoj/dotfiles.git ~/projects/dotfiles
 cd ~/projects/dotfiles
 
-# 3. Wire pre-commit hooks (one-time, per clone)
-make hooks
+# 2. One-shot: install brew packages, oh-my-zsh, custom plugins,
+#    symlink dotfiles into ~/ (with auto-backup), wire pre-commit hooks
+make setup
 
-# 4. Symlink dotfiles into $HOME (auto-backs up anything existing)
-make link
-
-# 5. Reload your shell
+# 3. Reload your shell
 exec zsh
 ```
 
-## Prerequisites
+If you'd rather do it piecemeal, run `make bootstrap`, `make link`, `make hooks` separately.
 
-The `.zshrc` references several tools — install before sourcing it, or comment out the references:
+## What `bootstrap` installs
 
-- [oh-my-zsh](https://ohmyz.sh/)
-- oh-my-zsh custom plugins: `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-z`, `autoenv`
-- [Homebrew](https://brew.sh/)
-- [Starship](https://starship.rs/)
-- [asdf](https://asdf-vm.com/) (with `golang` plugin)
-- [pre-commit](https://pre-commit.com/) and [gitleaks](https://gitleaks.io/) — for the secret-scanning git hook
-- Optional, referenced by PATH: Anaconda, Pulumi, Istio, Vagrant, libpq
+- **Homebrew packages**: `starship`, `asdf`, `autoenv`, `libpq`, `pre-commit`, `gitleaks`
+- **[oh-my-zsh](https://ohmyz.sh/)** (theme `agnoster`, no extra install)
+- **Custom oh-my-zsh plugins**: `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-z`
+
+Optional things `.zshrc` references but `bootstrap` does NOT install (do these yourself if you use them): asdf language plugins (`asdf plugin add golang`, `python`, etc.), tmux, AWS CLI, kubectl, terraform.
 
 ## Common workflows
 

@@ -11,10 +11,42 @@ FILES := .zshrc:.zshrc \
          .zprofile:.zprofile \
          .config/starship.toml:.config/starship.toml
 
-.PHONY: help backup install link import diff sync scan hooks hooks-run update-hooks clean-backups doctor
+BREW_PKGS := starship asdf autoenv libpq pre-commit gitleaks
+ZSH_CUSTOM_PLUGINS := \
+  https://github.com/zsh-users/zsh-autosuggestions:zsh-autosuggestions \
+  https://github.com/zsh-users/zsh-syntax-highlighting:zsh-syntax-highlighting \
+  https://github.com/agkozak/zsh-z:zsh-z
+
+.PHONY: help bootstrap setup backup install link import diff sync scan hooks hooks-run update-hooks clean-backups doctor
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+bootstrap: ## Install brew packages, oh-my-zsh, and required zsh custom plugins
+	@command -v brew >/dev/null || { echo "✗ install Homebrew first: https://brew.sh"; exit 1; }
+	@echo "→ installing brew packages: $(BREW_PKGS)"
+	@brew install $(BREW_PKGS)
+	@if [ ! -d "$$HOME/.oh-my-zsh" ]; then \
+	  echo "→ installing oh-my-zsh"; \
+	  RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"; \
+	else \
+	  echo "  oh-my-zsh already installed"; \
+	fi
+	@CUSTOM="$${ZSH_CUSTOM:-$$HOME/.oh-my-zsh/custom}"; \
+	for entry in $(ZSH_CUSTOM_PLUGINS); do \
+	  url="$${entry%:*}"; name="$${entry##*:}"; \
+	  dest="$$CUSTOM/plugins/$$name"; \
+	  if [ -d "$$dest" ]; then \
+	    echo "  $$name already installed"; \
+	  else \
+	    echo "→ cloning $$name"; \
+	    git clone --depth=1 "$$url" "$$dest"; \
+	  fi; \
+	done
+	@echo "✓ bootstrap complete"
+
+setup: bootstrap link hooks ## One-shot for new machines: bootstrap + link + hooks
+	@echo "✓ setup complete — open a new shell or 'exec zsh'"
 
 backup: ## Back up current ~/ dotfiles to ./backups/<timestamp>/
 	@mkdir -p $(BACKUP_DIR)
