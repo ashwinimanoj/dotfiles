@@ -17,7 +17,10 @@ ZSH_CUSTOM_PLUGINS := \
   https://github.com/zsh-users/zsh-syntax-highlighting:zsh-syntax-highlighting \
   https://github.com/agkozak/zsh-z:zsh-z
 
-.PHONY: help bootstrap setup backup install link import diff sync scan hooks hooks-run update-hooks clean-backups doctor
+ITERM_PLIST_HOME := $(HOME)/Library/Preferences/com.googlecode.iterm2.plist
+ITERM_PLIST_REPO := $(REPO)/iterm2/com.googlecode.iterm2.plist
+
+.PHONY: help bootstrap setup backup install link import diff sync scan hooks hooks-run update-hooks clean-backups doctor iterm-export iterm-import
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -125,6 +128,23 @@ update-hooks: ## Bump pre-commit hook versions to latest tagged releases
 
 clean-backups: ## Delete all local backup snapshots
 	@rm -rf $(REPO)/backups && echo "backups cleared"
+
+iterm-export: ## Snapshot iTerm2 prefs from ~/Library to repo (binary → XML)
+	@[ -f "$(ITERM_PLIST_HOME)" ] || { echo "✗ iTerm2 plist not found at $(ITERM_PLIST_HOME)"; exit 1; }
+	@mkdir -p $(REPO)/iterm2
+	@plutil -convert xml1 -o $(ITERM_PLIST_REPO) $(ITERM_PLIST_HOME)
+	@echo "  exported → iterm2/com.googlecode.iterm2.plist"
+
+iterm-import: ## Apply repo iTerm2 prefs to ~/Library (iTerm2 must be quit first)
+	@[ -f "$(ITERM_PLIST_REPO)" ] || { echo "✗ no plist in repo at $(ITERM_PLIST_REPO)"; exit 1; }
+	@if pgrep -x iTerm2 >/dev/null; then \
+	  echo "✗ iTerm2 is running — quit it first (it overwrites the plist on exit)"; \
+	  exit 1; \
+	fi
+	@cp $(ITERM_PLIST_REPO) $(ITERM_PLIST_HOME)
+	@plutil -convert binary1 $(ITERM_PLIST_HOME)
+	@killall cfprefsd 2>/dev/null || true
+	@echo "  imported. Open iTerm2."
 
 doctor: ## Show install status of each tracked file
 	@for pair in $(FILES); do \

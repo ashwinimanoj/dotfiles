@@ -7,6 +7,7 @@ Personal shell and tool configuration, managed with `make`.
 - `.zshrc` — zsh config (oh-my-zsh, plugins, aliases, PATH)
 - `.zprofile` — login shell setup (Homebrew shellenv, autoenv)
 - `.config/starship.toml` — Starship prompt config
+- `iterm2/com.googlecode.iterm2.plist` — iTerm2 preferences (XML, exported via `make iterm-export`)
 
 ## Install on a new machine
 
@@ -46,6 +47,8 @@ Run `make help` to see all available targets. Most-used:
 | `make scan`     | Run gitleaks against the repo                               |
 | `make sync`     | Scan + import + commit + push                               |
 | `make backup`   | Snapshot `~/` files into `./backups/<timestamp>/`           |
+| `make iterm-export` | Snapshot current iTerm2 prefs into the repo as XML      |
+| `make iterm-import` | Apply repo iTerm2 prefs to `~/Library/` (iTerm2 must be quit) |
 
 ## Updating
 
